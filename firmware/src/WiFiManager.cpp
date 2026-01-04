@@ -112,7 +112,6 @@ void WiFiManager::handleSave() {
                  "<p><a href='/'>Go back</a></p></body></html>"));
     }
 }
-}
 
 void WiFiManager::handleNotFound() {
     // Redirect to root for captive portal
