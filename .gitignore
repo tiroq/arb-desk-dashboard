@@ -26,6 +26,10 @@
 *.mod
 *.smod
 
+# Exception: Allow Go module files
+!go.mod
+!go.sum
+
 # Compiled Static libraries
 *.lai
 *.la
