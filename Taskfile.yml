@@ -1,0 +1,43 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the firmware
+    dir: firmware
+    cmds:
+      - platformio run
+
+  upload:
+    desc: Upload firmware to device
+    dir: firmware
+    cmds:
+      - platformio run --target upload
+
+  build-upload:
+    desc: Build and upload firmware
+    dir: firmware
+    cmds:
+      - platformio run --target upload
+
+  clean:
+    desc: Clean build artifacts
+    dir: firmware
+    cmds:
+      - platformio run --target clean
+
+  monitor:
+    desc: Monitor serial output
+    dir: firmware
+    cmds:
+      - platformio device monitor
+
+  server:
+    desc: Run test server
+    dir: testserver
+    cmds:
+      - go run main.go
+
+  default:
+    desc: Build the firmware (default task)
+    cmds:
+      - task: build
