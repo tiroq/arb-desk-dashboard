@@ -39,3 +39,15 @@
 
 # debug information files
 *.dwo
+
+# PlatformIO
+.pio/
+.vscode/
+.clang_complete
+.gcc-flags.json
+
+# Go
+*.test
+vendor/
+go.sum
+server/test-server
