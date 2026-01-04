@@ -8,7 +8,7 @@
 // Global objects
 Display display;
 WiFiManager wifiManager;
-MetricsClient* metricsClient = nullptr;
+MetricsClient metricsClient;
 AppConfig appConfig;
 
 // State variables
@@ -67,7 +67,7 @@ void setup() {
     delay(WIFI_STATUS_DISPLAY_MS);
     
     // Initialize metrics client
-    metricsClient = new MetricsClient(appConfig.server.url);
+    metricsClient.setServerUrl(appConfig.server.url);
     
     Serial.println(F("Setup complete, entering main loop"));
 }
@@ -101,18 +101,18 @@ void loop() {
     
     // Fetch metrics at configured interval
     unsigned long now = millis();
-    if (metricsClient && (now - lastMetricsFetch >= appConfig.refresh_ms)) {
+    if (now - lastMetricsFetch >= appConfig.refresh_ms) {
         lastMetricsFetch = now;
         
-        bool success = metricsClient->fetchMetrics(currentMetrics);
+        bool success = metricsClient.fetchMetrics(currentMetrics);
         
         if (!success) {
             Serial.print(F("Metrics fetch failed. Failures: "));
-            Serial.println(metricsClient->getFailureCount());
+            Serial.println(metricsClient.getFailureCount());
         }
         
         // Check for alert conditions
-        if (metricsClient->getFailureCount() >= MAX_CONSECUTIVE_FAILURES || currentMetrics.status == 0) {
+        if (metricsClient.getFailureCount() >= MAX_CONSECUTIVE_FAILURES || currentMetrics.status == 0) {
             alertMode = true;
         } else {
             alertMode = false;
@@ -121,7 +121,7 @@ void loop() {
     
     // Display logic
     if (alertMode) {
-        if (metricsClient->getFailureCount() >= MAX_CONSECUTIVE_FAILURES) {
+        if (metricsClient.getFailureCount() >= MAX_CONSECUTIVE_FAILURES) {
             display.showAlert("NO DATA");
         } else if (currentMetrics.status == 0) {
             display.showAlert("BOT DOWN");
@@ -129,6 +129,7 @@ void loop() {
         delay(1000);
     } else {
         // Rotate through screens
+        // Note: millis() rollover (~49.7 days) is handled correctly by unsigned arithmetic
         if (now - lastScreenRotation >= SCREEN_ROTATION_MS) {
             lastScreenRotation = now;
             currentScreen = (currentScreen + 1) % 3;

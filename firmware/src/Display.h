@@ -21,7 +21,7 @@ struct MetricsData {
     int bestArb;         // b: percentage × 100
     int pnl;             // p: cents
     int errors;          // e: count
-    unsigned long timestamp; // ts: epoch
+    uint32_t timestamp;  // ts: epoch seconds (uint32_t for consistency, valid until year 2106)
 };
 
 class Display {

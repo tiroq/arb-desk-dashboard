@@ -123,13 +123,16 @@ void Display::showAlert(const char* message) {
 }
 
 void Display::formatPNL(int cents, char* buffer, size_t bufSize) {
-    int dollars = cents / 100;
-    int remainder = abs(cents % 100);
-    
     if (cents >= 0) {
+        int dollars = cents / 100;
+        int remainder = cents % 100;
         snprintf(buffer, bufSize, "$%d.%02d", dollars, remainder);
     } else {
-        snprintf(buffer, bufSize, "-$%d.%02d", abs(dollars), remainder);
+        // Handle negative values correctly
+        int absCents = -cents;
+        int dollars = absCents / 100;
+        int remainder = absCents % 100;
+        snprintf(buffer, bufSize, "-$%d.%02d", dollars, remainder);
     }
 }
 

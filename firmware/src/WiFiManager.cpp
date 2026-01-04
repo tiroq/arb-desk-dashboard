@@ -4,6 +4,7 @@
 WiFiManager::WiFiManager() : server(80), dnsServer(), portalActive(false) {}
 
 bool WiFiManager::connectWiFi(const WifiConfig &config, unsigned long timeoutMs) {
+    WiFi.disconnect(true);  // Clear previous WiFi configuration
     WiFi.mode(WIFI_STA);
     WiFi.begin(config.ssid, config.password);
     
@@ -26,6 +27,7 @@ bool WiFiManager::connectWiFi(const WifiConfig &config, unsigned long timeoutMs)
 }
 
 void WiFiManager::startCaptivePortal(const char* apSSID) {
+    WiFi.disconnect();  // Disconnect from any station mode connections
     WiFi.mode(WIFI_AP);
     WiFi.softAP(apSSID);
     
@@ -95,6 +97,12 @@ void WiFiManager::handleSave() {
                  "<p>Device will reboot in 3 seconds...</p></body></html>"));
         
         delay(500);
+        
+        // Gracefully shut down captive portal services before restart
+        portalActive = false;
+        dnsServer.stop();
+        server.stop();
+        
         ESP.restart();
     } else {
         // Error response - use PROGMEM string

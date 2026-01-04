@@ -7,7 +7,17 @@ MetricsClient::MetricsClient(const char* serverUrl) : failureCount(0) {
     baseUrl[sizeof(baseUrl) - 1] = '\0';
 }
 
+void MetricsClient::setServerUrl(const char* serverUrl) {
+    strncpy(baseUrl, serverUrl, sizeof(baseUrl) - 1);
+    baseUrl[sizeof(baseUrl) - 1] = '\0';
+}
+
 bool MetricsClient::fetchMetrics(MetricsData &data) {
+    // Check if server URL is set
+    if (baseUrl[0] == '\0') {
+        return false;
+    }
+    
     char url[160];
     snprintf(url, sizeof(url), "%s/api/v1/metrics", baseUrl);
     
@@ -24,10 +34,20 @@ bool MetricsClient::fetchMetrics(MetricsData &data) {
         return false;
     }
     
+    // Validate response size against buffer capacity
+    int contentLength = http.getSize();
+    if (contentLength < 0 || contentLength >= METRICS_JSON_SIZE) {
+        Serial.print(F("HTTP response too large or size unknown: "));
+        Serial.println(contentLength);
+        http.end();
+        failureCount++;
+        return false;
+    }
+    
     // Use getStream() to avoid String allocation
     WiFiClient* stream = http.getStreamPtr();
     char buffer[METRICS_JSON_SIZE];
-    int len = stream->readBytes(buffer, sizeof(buffer) - 1);
+    int len = stream->readBytes(buffer, contentLength);
     buffer[len] = '\0';
     
     http.end();

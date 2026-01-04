@@ -7,8 +7,10 @@
 
 class MetricsClient {
 public:
+    MetricsClient() : failureCount(0) { baseUrl[0] = '\0'; }
     MetricsClient(const char* serverUrl);
     
+    void setServerUrl(const char* serverUrl);
     bool fetchMetrics(MetricsData &data);
     int getFailureCount() const { return failureCount; }
     void resetFailureCount() { failureCount = 0; }

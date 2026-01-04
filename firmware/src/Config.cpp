@@ -9,11 +9,7 @@ bool loadConfig(AppConfig &config) {
     strncpy(config.server.url, DEFAULT_SERVER_URL, sizeof(config.server.url));
     config.refresh_ms = 3000;
 
-    if (!LittleFS.begin()) {
-        Serial.println(F("LittleFS mount failed"));
-        return false;
-    }
-
+    // LittleFS should already be mounted by main.cpp
     if (!LittleFS.exists(CONFIG_FILE_PATH)) {
         Serial.println(F("Config file not found, using defaults"));
         return false;

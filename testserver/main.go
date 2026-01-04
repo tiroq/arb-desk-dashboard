@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -26,6 +27,7 @@ var (
 	mode      = flag.String("mode", "ok", "Server mode: ok, down, or flap")
 	latencyMs = flag.Int("latency-ms", 35, "Base latency in milliseconds")
 	rng       = rand.New(rand.NewSource(time.Now().UnixNano()))
+	rngMutex  sync.Mutex // Protect concurrent access to rng
 )
 
 func main() {
@@ -81,6 +83,13 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(html))
 }
 
+// safeIntn returns a thread-safe random number in [0,n)
+func safeIntn(n int) int {
+	rngMutex.Lock()
+	defer rngMutex.Unlock()
+	return rng.Intn(n)
+}
+
 func handleMetrics(w http.ResponseWriter, r *http.Request) {
 	var resp MetricsResponse
 
@@ -93,13 +102,13 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 			ActiveTriangles: 0,
 			BestArb:         0,
 			PNL:             0,
-			Errors:          rng.Intn(20) + 5,
+			Errors:          safeIntn(20) + 5,
 			Timestamp:       time.Now().Unix(),
 		}
 
 	case "flap":
 		// Randomly flap between ok and down
-		if rng.Intn(2) == 0 {
+		if safeIntn(2) == 0 {
 			resp = generateOkMetrics()
 		} else {
 			resp = MetricsResponse{
@@ -107,8 +116,8 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 				Latency:         0,
 				ActiveTriangles: 0,
 				BestArb:         0,
-				PNL:             rng.Intn(2000) - 500,
-				Errors:          rng.Intn(15),
+				PNL:             safeIntn(2000) - 500,
+				Errors:          safeIntn(15),
 				Timestamp:       time.Now().Unix(),
 			}
 		}
@@ -124,11 +133,11 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 func generateOkMetrics() MetricsResponse {
 	return MetricsResponse{
 		Status:          1,
-		Latency:         *latencyMs + rng.Intn(20) - 10,
-		ActiveTriangles: rng.Intn(15) + 1,
-		BestArb:         rng.Intn(80) + 5,  // 0.05% to 0.85%
-		PNL:             rng.Intn(5000),    // $0 to $50
-		Errors:          rng.Intn(3),       // 0-2 errors
+		Latency:         *latencyMs + safeIntn(20) - 10,
+		ActiveTriangles: safeIntn(15) + 1,
+		BestArb:         safeIntn(80) + 5,  // 0.05% to 0.85%
+		PNL:             safeIntn(5000),    // $0 to $50
+		Errors:          safeIntn(3),       // 0-2 errors
 		Timestamp:       time.Now().Unix(),
 	}
 }

@@ -60,7 +60,7 @@ arb-desk-dashboard/
 - ESP8266-12F or compatible board (NodeMCU, Wemos D1 Mini, etc.)
 - ST7789 240x240 TFT LCD display
 - PlatformIO or Arduino IDE
-- Go 1.16+ (for test server)
+- Go 1.21+ (for test server)
 
 ### 1. Hardware Setup
 
@@ -353,7 +353,7 @@ pio device monitor --baud 115200
 - ESP8266 Arduino Core
 
 **Test Server:**
-- Go 1.16+ standard library only
+- Go 1.21+ standard library only
 
 ## 🔒 Security Notes
 
