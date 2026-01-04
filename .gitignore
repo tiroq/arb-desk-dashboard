@@ -22,10 +22,6 @@
 *.dylib
 *.dll
 
-# Fortran module files
-*.smod
-!go.mod
-
 # Compiled Static libraries
 *.lai
 *.la
