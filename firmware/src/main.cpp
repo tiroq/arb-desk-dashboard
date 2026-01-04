@@ -61,7 +61,8 @@ void setup() {
     
     // Show WiFi connected screen
     char ipStr[16];
-    snprintf(ipStr, sizeof(ipStr), "%s", WiFi.localIP().toString().c_str());
+    IPAddress ip = WiFi.localIP();
+    snprintf(ipStr, sizeof(ipStr), "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
     display.showWiFiConnected(appConfig.wifi.ssid, ipStr);
     delay(WIFI_STATUS_DISPLAY_MS);
     
@@ -86,7 +87,8 @@ void loop() {
         
         if (wifiManager.connectWiFi(appConfig.wifi, WIFI_CONNECT_TIMEOUT_MS)) {
             char ipStr[16];
-            snprintf(ipStr, sizeof(ipStr), "%s", WiFi.localIP().toString().c_str());
+            IPAddress ip = WiFi.localIP();
+            snprintf(ipStr, sizeof(ipStr), "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
             display.showWiFiConnected(appConfig.wifi.ssid, ipStr);
             delay(WIFI_STATUS_DISPLAY_MS);
             alertMode = false;

@@ -24,10 +24,15 @@ bool MetricsClient::fetchMetrics(MetricsData &data) {
         return false;
     }
     
-    String payload = http.getString();
+    // Use getStream() to avoid String allocation
+    WiFiClient* stream = http.getStreamPtr();
+    char buffer[METRICS_JSON_SIZE];
+    int len = stream->readBytes(buffer, sizeof(buffer) - 1);
+    buffer[len] = '\0';
+    
     http.end();
     
-    bool success = parseMetrics(payload.c_str(), data);
+    bool success = parseMetrics(buffer, data);
     
     if (success) {
         failureCount = 0;

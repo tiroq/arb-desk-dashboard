@@ -63,17 +63,23 @@ void WiFiManager::handleRoot() {
 void WiFiManager::handleSave() {
     AppConfig config;
     
-    // Get form data
-    String ssid = server.arg("ssid");
-    String password = server.arg("password");
-    String url = server.arg("url");
-    String refresh = server.arg("refresh");
+    // Get form data directly without String objects
+    const char* ssid = server.arg("ssid").c_str();
+    const char* password = server.arg("password").c_str();
+    const char* url = server.arg("url").c_str();
+    int refresh = server.arg("refresh").toInt();
     
     // Populate config struct
-    strncpy(config.wifi.ssid, ssid.c_str(), sizeof(config.wifi.ssid) - 1);
-    strncpy(config.wifi.password, password.c_str(), sizeof(config.wifi.password) - 1);
-    strncpy(config.server.url, url.c_str(), sizeof(config.server.url) - 1);
-    config.refresh_ms = refresh.toInt();
+    strncpy(config.wifi.ssid, ssid, sizeof(config.wifi.ssid) - 1);
+    config.wifi.ssid[sizeof(config.wifi.ssid) - 1] = '\0';
+    
+    strncpy(config.wifi.password, password, sizeof(config.wifi.password) - 1);
+    config.wifi.password[sizeof(config.wifi.password) - 1] = '\0';
+    
+    strncpy(config.server.url, url, sizeof(config.server.url) - 1);
+    config.server.url[sizeof(config.server.url) - 1] = '\0';
+    
+    config.refresh_ms = refresh;
     
     // Clamp refresh rate
     if (config.refresh_ms < MIN_REFRESH_MS) config.refresh_ms = MIN_REFRESH_MS;
