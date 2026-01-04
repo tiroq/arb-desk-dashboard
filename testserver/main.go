@@ -25,12 +25,11 @@ var (
 	port      = flag.Int("port", 8080, "Server port")
 	mode      = flag.String("mode", "ok", "Server mode: ok, down, or flap")
 	latencyMs = flag.Int("latency-ms", 35, "Base latency in milliseconds")
+	rng       = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func main() {
 	flag.Parse()
-
-	rand.Seed(time.Now().UnixNano())
 
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/api/v1/metrics", handleMetrics)
@@ -94,13 +93,13 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 			ActiveTriangles: 0,
 			BestArb:         0,
 			PNL:             0,
-			Errors:          rand.Intn(20) + 5,
+			Errors:          rng.Intn(20) + 5,
 			Timestamp:       time.Now().Unix(),
 		}
 
 	case "flap":
 		// Randomly flap between ok and down
-		if rand.Intn(2) == 0 {
+		if rng.Intn(2) == 0 {
 			resp = generateOkMetrics()
 		} else {
 			resp = MetricsResponse{
@@ -108,8 +107,8 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 				Latency:         0,
 				ActiveTriangles: 0,
 				BestArb:         0,
-				PNL:             rand.Intn(2000) - 500,
-				Errors:          rand.Intn(15),
+				PNL:             rng.Intn(2000) - 500,
+				Errors:          rng.Intn(15),
 				Timestamp:       time.Now().Unix(),
 			}
 		}
@@ -125,11 +124,11 @@ func handleMetrics(w http.ResponseWriter, r *http.Request) {
 func generateOkMetrics() MetricsResponse {
 	return MetricsResponse{
 		Status:          1,
-		Latency:         *latencyMs + rand.Intn(20) - 10,
-		ActiveTriangles: rand.Intn(15) + 1,
-		BestArb:         rand.Intn(80) + 5,  // 0.05% to 0.85%
-		PNL:             rand.Intn(5000),    // $0 to $50
-		Errors:          rand.Intn(3),       // 0-2 errors
+		Latency:         *latencyMs + rng.Intn(20) - 10,
+		ActiveTriangles: rng.Intn(15) + 1,
+		BestArb:         rng.Intn(80) + 5,  // 0.05% to 0.85%
+		PNL:             rng.Intn(5000),    // $0 to $50
+		Errors:          rng.Intn(3),       // 0-2 errors
 		Timestamp:       time.Now().Unix(),
 	}
 }
