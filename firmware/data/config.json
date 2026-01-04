@@ -1,0 +1,10 @@
+{
+  "wifi": {
+    "ssid": "MyWiFi",
+    "pass": "MyPassword"
+  },
+  "server": {
+    "url": "http://192.168.1.10:8080"
+  },
+  "refresh_ms": 3000
+}
